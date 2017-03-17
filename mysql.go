@@ -1,3 +1,15 @@
+/*
+*
+* Author: Hui Ye - <bonjovis@163.com>
+*
+* Last modified: 2017-03-17 09:21
+*
+* Filename: mysql.go
+*
+* Copyright (c) 2016 JOVI
+*
+ */
+
 package mysql
 
 //mysql
