@@ -81,10 +81,16 @@ func (dbPool *DbPool) FindOne(st string) map[string]interface{} {
 	return record
 }
 
-func (dbPool *DbPool) Counts(st string) int {
-	var cnt int
-	_ = dbPool.db.QueryRow(st).Scan(&cnt)
+func (dbPool *DbPool) Counts(sql string) int {
+	cnt := 0
+	_ = dbPool.db.QueryRow(sql).Scan(&cnt)
 	return cnt
+}
+
+func (dbPool *DbPool) GetLatestId(sql string) int64 {
+	id := 0
+	_ = dbPool.db.QueryRow(sql).Scan(&id)
+	return int64(id)
 }
 
 func (dbPool *DbPool) MultiInsert(param []map[string]interface{}, tablename string) int64 {
