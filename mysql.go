@@ -2,9 +2,9 @@
 *
 * Author: Hui Ye - <bonjovis@163.com>
 *
-* Last modified: 2017-03-17 09:21
+* Last modified:	2017-03-27 02:28
 *
-* Filename: mysql.go
+* Filename:		mysql.go
 *
 * Copyright (c) 2016 JOVI
 *
@@ -24,10 +24,10 @@ type DbPool struct {
 	db *sql.DB
 }
 
-func NewDatabaseConnectionPool(user, pwd, host string) *DbPool {
-	db, _ := sql.Open("mysql", user+":"+pwd+"@"+host)
-	db.SetMaxOpenConns(200)
-	db.SetMaxIdleConns(100)
+func NewDatabaseConnectionPool(dbHost string, maxOpenConns, maxIdleConns int) *DbPool {
+	db, _ := sql.Open("mysql", dbHost)
+	db.SetMaxOpenConns(maxOpenConns)
+	db.SetMaxIdleConns(maxIdleConns)
 	dbPool := DbPool{db}
 	return &dbPool
 }
@@ -178,13 +178,11 @@ func (dbPool *DbPool) Insert(param map[string]interface{}, tablename string) int
 
 func checkErr(err error) bool {
 	if err != nil {
+		fmt.Println(err)
 		if strings.Index(err.Error(), "Deadlock found when trying to get lock; try restarting transaction") > -1 {
-			fmt.Println("==============Try Again======================")
-			fmt.Println(err)
 			time.Sleep(20000 * time.Millisecond)
 			return true
 		}
-		panic(err)
 	}
 	return false
 }
