@@ -14,6 +14,7 @@ package mysql
 
 //mysql
 import "fmt"
+import "log"
 import "time"
 import "strconv"
 import "strings"
@@ -93,6 +94,19 @@ func (dbPool *DbPool) GetLatestId(sql string) int64 {
 	return int64(id)
 }
 
+func (dbPool *DbPool) Update(sql string, vals []interface{}) int64 {
+	stmt, err := dbPool.db.Prepare(sql)
+	defer stmt.Close()
+	checkErr(err)
+	result, err := stmt.Exec(vals...)
+	if checkErr(err) {
+		return -1
+	}
+	affectLines, err := result.RowsAffected()
+	checkErr(err)
+	return affectLines
+}
+
 func (dbPool *DbPool) MultiInsert(param []map[string]interface{}, tablename string) int64 {
 	var keys []string
 	var vals = []interface{}{}
@@ -120,12 +134,10 @@ func (dbPool *DbPool) MultiInsert(param []map[string]interface{}, tablename stri
 						vals = append(vals, strconv.FormatFloat(value.(float64), 'f', -1, 64))
 					default:
 						vals = append(vals, "")
-						fmt.Println("Replace into not type")
 					}
 				} else {
 					vals = append(vals, "")
 				}
-				//vals = append(vals, row[v])
 			}
 			sqlStr = strings.TrimSuffix(sqlStr, ",")
 			sqlStr += "),"
@@ -137,8 +149,9 @@ func (dbPool *DbPool) MultiInsert(param []map[string]interface{}, tablename stri
 		if checkErr(err) {
 			return -1
 		}
-		stmt.Close()
+		defer stmt.Close()
 		affectLines, err := result.RowsAffected()
+		checkErr(err)
 		return affectLines
 	}
 	return 0
@@ -178,7 +191,7 @@ func (dbPool *DbPool) Insert(param map[string]interface{}, tablename string) int
 
 func checkErr(err error) bool {
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		if strings.Index(err.Error(), "Deadlock found when trying to get lock; try restarting transaction") > -1 {
 			time.Sleep(20000 * time.Millisecond)
 			return true
