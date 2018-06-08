@@ -1,4 +1,4 @@
-# go-mysql lib
+# go-mysql
 Golang language integration of mysql operations
 
 ## Table of contents:
