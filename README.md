@@ -1,4 +1,5 @@
 # go-mysql lib
+Golang language integration of mysql operations
 
 ## Table of contents:
 - [Get Started](#get-started)
