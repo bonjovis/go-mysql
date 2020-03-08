@@ -19,7 +19,7 @@ import "time"
 import "strconv"
 import "strings"
 import "database/sql"
-import _ "github.com/go-sql-driver/mysql"
+import "github.com/go-sql-driver/mysql"
 
 type DbPool struct {
 	db *sql.DB
@@ -187,6 +187,17 @@ func (dbPool *DbPool) Insert(param map[string]interface{}, tablename string) int
 	lastId, err := result.LastInsertId()
 	checkErr(err)
 	return lastId
+}
+
+func (dbPool *DbPool) LoadData(path string, tablename string, fields string, enclosed string, lines string) int64 {
+	mysql.RegisterLocalFile(path)
+	result, err := db.Exec("LOAD DATA LOCAL INFILE '" + path + "' INTO TABLE " + tablename + " FIELDS TERMINATED BY '" + fields + "' ENCLOSED BY '" + enclosed + "' LINES TERMINATED BY '" + lines + "' IGNORE 1 ROWS;")
+	if checkErr(err) {
+		return -1
+	}
+	affectLines, err := result.RowsAffected()
+	checkErr(err)
+	return affectLines
 }
 
 func checkErr(err error) bool {
