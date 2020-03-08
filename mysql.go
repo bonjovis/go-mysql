@@ -191,7 +191,7 @@ func (dbPool *DbPool) Insert(param map[string]interface{}, tablename string) int
 
 func (dbPool *DbPool) LoadData(path string, tablename string, fields string, enclosed string, lines string) int64 {
 	mysql.RegisterLocalFile(path)
-	result, err := db.Exec("LOAD DATA LOCAL INFILE '" + path + "' INTO TABLE " + tablename + " FIELDS TERMINATED BY '" + fields + "' ENCLOSED BY '" + enclosed + "' LINES TERMINATED BY '" + lines + "' IGNORE 1 ROWS;")
+	result, err := dbPool.db.Exec("LOAD DATA LOCAL INFILE '" + path + "' INTO TABLE " + tablename + " FIELDS TERMINATED BY '" + fields + "' ENCLOSED BY '" + enclosed + "' LINES TERMINATED BY '" + lines + "' IGNORE 1 ROWS;")
 	if checkErr(err) {
 		return -1
 	}
