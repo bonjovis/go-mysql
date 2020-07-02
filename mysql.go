@@ -102,6 +102,9 @@ func (dbPool *DbPool) Update(sql string, vals []interface{}) int64 {
 	if checkErr(err) {
 		return -1
 	}
+	if isNil(result) {
+		return -1
+	}
 	affectLines, err := result.RowsAffected()
 	checkErr(err)
 	return affectLines
@@ -150,6 +153,9 @@ func (dbPool *DbPool) MultiInsert(param []map[string]interface{}, tablename stri
 			return -1
 		}
 		defer stmt.Close()
+		if isNil(result) {
+			return -1
+		}
 		affectLines, err := result.RowsAffected()
 		checkErr(err)
 		return affectLines
@@ -184,6 +190,9 @@ func (dbPool *DbPool) Insert(param map[string]interface{}, tablename string) int
 	if checkErr(err) {
 		return -1
 	}
+	if isNil(result) {
+		return -1
+	}
 	lastId, err := result.LastInsertId()
 	checkErr(err)
 	return lastId
@@ -198,4 +207,8 @@ func checkErr(err error) bool {
 		}
 	}
 	return false
+}
+
+func isNil(i interface{}) bool {
+	return i == nil
 }
