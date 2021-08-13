@@ -163,6 +163,41 @@ func (dbPool *DbPool) MultiInsert(param []map[string]interface{}, tablename stri
 	return 0
 }
 
+func (dbPool *DbPool) InsertN(param map[string]interface{}, tablename string) int64 {
+	var keys []string
+	var values []string
+	for key, value := range param {
+		keys = append(keys, key)
+		if value != nil {
+			switch value.(type) {
+			case int:
+				values = append(values, strconv.Itoa(value.(int)))
+			case int32, int64:
+				values = append(values, strconv.FormatInt(value.(int64), 10))
+			case string:
+				values = append(values, EscapeString(value.(string)))
+			case float32, float64:
+				values = append(values, strconv.FormatFloat(value.(float64), 'f', -1, 64))
+			}
+		} else {
+			values = append(values, "")
+		}
+	}
+	fileValue := "'" + strings.Join(values, "','") + "'"
+	fileds := "`" + strings.Join(keys, "`,`") + "`"
+	sql := fmt.Sprintf("INSERT INTO %v (%v) VALUES (%v)", tablename, fileds, fileValue)
+	result, err := dbPool.db.Exec(sql)
+	if checkErr(err) {
+		return -1
+	}
+	if isNil(result) {
+		return -1
+	}
+	lastId, err := result.LastInsertId()
+	checkErr(err)
+	return lastId
+}
+
 func (dbPool *DbPool) Insert(param map[string]interface{}, tablename string) int64 {
 	var keys []string
 	var values []string
