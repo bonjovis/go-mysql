@@ -53,7 +53,7 @@ func (dbPool *DbPool) FindAll(st string) []map[string]interface{} {
 			if col != nil {
 				record[columns[i]] = string(col.([]byte))
 			} else {
-				record[columns[i]] = '' 
+				record[columns[i]] = nil
 			}
 		}
 		citems = append(citems, record)
