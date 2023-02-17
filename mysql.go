@@ -52,6 +52,8 @@ func (dbPool *DbPool) FindAll(st string) []map[string]interface{} {
 		for i, col := range values {
 			if col != nil {
 				record[columns[i]] = string(col.([]byte))
+			} else {
+				record[columns[i]] = '' 
 			}
 		}
 		citems = append(citems, record)
